@@ -6,10 +6,11 @@ import {
   Param,
   Post,
   Put,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Authentify } from 'src/decorators/authentify';
 import { DonateService } from './donate.service';
-import { AgencyDto, LoginDto } from './dto/agency.dto';
+import { CreateAgencyDto, LoginDto } from './dto/agency.dto';
 import { CampaignDto } from './dto/campaign.dto';
 import { TransactionDto } from './dto/transaction.dto';
 
@@ -30,6 +31,19 @@ export class DonateController {
   @Post('login')
   login(@Body() data: LoginDto) {
     return this.donateService.login(data.email, data.password);
+  }
+
+  @Post('agency')
+  createAgency(@Body() agency: CreateAgencyDto) {
+    return this.donateService.createAgency(agency);
+  }
+
+  @Put('agency/approve/:id')
+  approveAgency(@Param('id') id: string, @Authentify() user) {
+    if (!user || user.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+    return this.donateService.approveAgency(id);
   }
 
   //   @Get('agency/:id')
@@ -72,11 +86,6 @@ export class DonateController {
   //     return this.donateService.getCampaignTransactions(id);
   //   }
 
-  //   @Post('agency')
-  //   async createAgency(@Body() agency: AgencyDto) {
-  //     return this.donateService.createAgency(agency);
-  //   }
-
   //   @Post('campaign')
   //   async createCampaign(@Body() campaign: CampaignDto) {
   //     return this.donateService.createCampaign(campaign);
@@ -95,11 +104,6 @@ export class DonateController {
   //   @Get('agency/:id/transactons')
   //   async getAgencyTransactions(@Param('id') id: string) {
   //     return this.donateService.getAgencyTransactions(id);
-  //   }
-
-  //   @Put('approve/agency/:id')
-  //   async approveAgency(@Param('id') id: string) {
-  //     return this.donateService.approveAgency(id);
   //   }
 
   //   @Delete('delete/agency/:id')

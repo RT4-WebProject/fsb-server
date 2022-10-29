@@ -6,18 +6,28 @@ import {
   IsEmail,
 } from 'class-validator';
 
-export class AgencyDto {
-  id: string;
-  createdAt: Date;
+export class CreateAgencyDto {
+  @IsNotEmpty()
   name: string;
-  website: string;
-  social: string;
+
+  @IsNotEmpty()
   phone: string;
+
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
+
+  @IsNotEmpty()
   image: string;
-  approved: boolean;
+
+  @IsNotEmpty()
   countries: string;
+
+  @IsNotEmpty()
   description: string;
+
+  @IsNotEmpty()
+  password: string;
 }
 
 export class LoginDto {

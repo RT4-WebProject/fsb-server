@@ -1,4 +1,9 @@
-import { Inject, Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   hashPassword,
@@ -12,6 +17,7 @@ import { Repository, Like, Double, Not } from 'typeorm';
 import { Agency } from '../models/agency.entity';
 import { Campaign } from '../models/campaign.entity';
 import { Transaction } from '../models/transaction.entity';
+import { CreateAgencyDto } from './dto/agency.dto';
 
 @Injectable()
 export class DonateService {
@@ -65,11 +71,6 @@ export class DonateService {
   //     });
   //   }
 
-  //   async createAgency(agency: Agency) {
-  //     // agency.id = this.uuid();
-  //     return this.agencyRepository.save(agency);
-  //   }
-
   //   async createCampaign(campaign: Campaign) {
   //     // campaign.id = this.uuid();
   //     return this.campaignRepository.save(campaign);
@@ -96,11 +97,18 @@ export class DonateService {
   //     });
   //   }
 
-  //   async approveAgency(id: any) {
-  //     const agency = await this.agencyRepository.findOne(id);
-  //     agency.approved = true;
-  //     return this.agencyRepository.save(agency);
-  //   }
+  async approveAgency(id: any) {
+    const agency = await this.agencyRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    agency.approved = true;
+    await this.agencyRepository.save(agency);
+    return {
+      done: true,
+    };
+  }
 
   //   async deleteAgency(id: any) {
   //     return this.agencyRepository.delete(id);
@@ -160,6 +168,30 @@ export class DonateService {
   //     });
   //   }
 
+  async createAgency(_agency: CreateAgencyDto) {
+    try {
+      const agency = new Agency();
+      agency.name = _agency.name;
+      agency.email = _agency.email;
+      agency.password = await hashPassword(_agency.password);
+      agency.approved = false;
+      agency.countries = _agency.countries;
+      agency.description = _agency.description;
+      agency.image = _agency.image;
+      agency.phone = _agency.phone;
+      agency.role = 'agency';
+
+      await this.agencyRepository.save(agency);
+      return {
+        done: true,
+      };
+    } catch (e) {
+      if (e.code === '23505') {
+        throw new BadRequestException('Email already exists');
+      }
+    }
+  }
+
   async me(id: any) {
     console.log(id);
 
@@ -188,23 +220,58 @@ export class DonateService {
     return user;
   }
 
-  async login(email: string, password: string) {
+  private async userLogin(email: string, password: string) {
     const user = await this.userRepository.findOne({
       where: {
         email,
       },
     });
 
-    console.log('user', user);
-
     if (!user) {
-      throw new ForbiddenException('User not found');
+      return null;
     }
 
     const valid = await comparePassword(password, user.password);
 
     if (!valid) {
       throw new ForbiddenException('Invalid password');
+    }
+
+    return user;
+  }
+
+  private async agencyLogin(email: string, password: string) {
+    const user = await this.agencyRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.approved) {
+      throw new ForbiddenException('Agency not approved');
+    }
+
+    const valid = await comparePassword(password, user.password);
+
+    if (!valid) {
+      throw new ForbiddenException('Invalid password');
+    }
+
+    return user;
+  }
+
+  async login(email: string, password: string) {
+    let user = await this.userLogin(email, password);
+    if (!user) {
+      user = await this.agencyLogin(email, password);
+    }
+
+    if (!user) {
+      throw new ForbiddenException('Invalid email');
     }
 
     const token = await generateToken(user);
