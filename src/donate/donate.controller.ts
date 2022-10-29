@@ -109,6 +109,9 @@ export class DonateController {
         return this.donateService.getAgencyActiveCampaigns(id);
     }
 
-    
+    @Get('agency/:id/feedbacks')
+    async getAgencyFeedbacks(@Param('id') id: string) {
+        return this.donateService.getAgencyFeedbacks(id);
+    }
     
 }

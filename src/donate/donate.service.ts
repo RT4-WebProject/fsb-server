@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Double } from 'typeorm';
+import { Repository, Like, Double, Not } from 'typeorm';
 
 import { Agency } from '../models/agency.entity';
 import { Campaign } from '../models/campaign.entity';
@@ -136,6 +136,15 @@ export class DonateService {
             where: {
                 launchedBy: id,
                 activeNow: true
+            }
+        });
+    }
+
+    async getAgencyFeedbacks(id: any) {
+        return this.transactionRepository.find({
+            where: {
+                agencyID: id,
+                feedback: Not(Like(''))
             }
         });
     }
