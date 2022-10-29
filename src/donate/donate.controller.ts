@@ -18,11 +18,6 @@ import { TransactionDto } from './dto/transaction.dto';
 export class DonateController {
   constructor(private readonly donateService: DonateService) {}
 
-  //   @Post('get')
-  //   hi() {
-  //     return this.donateService.createUser();
-  //   }
-
   @Get('me')
   me(@Authentify() user) {
     return this.donateService.me(user ? user.id : null);
@@ -71,10 +66,10 @@ export class DonateController {
   //     return this.donateService.getCampaigns();
   //   }
 
-  //   @Get('agencies')
-  //   async getAgencies() {
-  //     return this.donateService.getAgencies();
-  //   }
+  @Get('agency')
+  getAgencies() {
+    return this.donateService.getAgencies();
+  }
 
   //   @Get('agency/:id/campaigns')
   //   async getAgencyCampaigns(@Param('id') id: string) {

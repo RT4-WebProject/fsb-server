@@ -51,9 +51,21 @@ export class DonateService {
   //     return this.campaignRepository.find();
   //   }
 
-  //   async getAgencies() {
-  //     return this.agencyRepository.find();
-  //   }
+  getAgencies() {
+    return this.agencyRepository.find({
+      select: [
+        'id',
+        'name',
+        'email',
+        'approved',
+        'role',
+        'description',
+        'countries',
+        'image',
+        'phone',
+      ],
+    });
+  }
 
   //   async getAgencyCampaigns(id: any) {
   //     return this.campaignRepository.find({
@@ -209,7 +221,7 @@ export class DonateService {
         where: {
           id,
         },
-        select: ['id', 'name', 'email', 'approved'],
+        select: ['id', 'name', 'email', 'approved', 'role'],
       });
       if (!agency) {
         throw new ForbiddenException();
