@@ -11,4 +11,5 @@ export class TransactionDto{
     receiptBlockchain: string;
     fromCountry: string;
     campaignID: string;
+    agencyID: string;
 }

@@ -77,4 +77,12 @@ export class DonateService {
         });
     }
 
+    async getAgencyTransactions(id: any) {
+        return this.transactionRepository.find({
+            where: {
+                agencyID: id
+            }
+        });
+    }
+
 }

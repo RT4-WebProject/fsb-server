@@ -19,4 +19,6 @@ export class Transaction extends BaseModel {
     fromCountry: string;
     @Column({type: 'varchar', length: 255})
     campaignID: string;
+    @Column({type: 'varchar', length: 255})
+    agencyID: string;
 }

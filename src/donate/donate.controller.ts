@@ -69,4 +69,9 @@ export class DonateController {
         return this.donateService.getCampaignsByCountry(country);
     }
 
+    @Get('agency/:id/transactons')
+    async getAgencyTransactions(@Param('id') id: string) {
+        return this.donateService.getAgencyTransactions(id);
+    }
+
 }
