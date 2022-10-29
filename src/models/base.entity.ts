@@ -1,9 +1,9 @@
-import {PrimaryGeneratedColumn, CreateDateColumn} from "typeorm";
+import { PrimaryGeneratedColumn, CreateDateColumn, BaseEntity } from 'typeorm';
 
-export abstract class BaseModel {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+export abstract class BaseModel extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: string;
 
-    @CreateDateColumn({ readonly: true })
-    createdAt: Date;
+  @CreateDateColumn({ readonly: true })
+  createdAt: Date;
 }

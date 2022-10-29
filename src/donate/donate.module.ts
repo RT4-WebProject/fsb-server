@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Transaction } from 'src/models/transaction.entity';
 import { Agency } from 'src/models/agency.entity';
 import { Campaign } from 'src/models/campaign.entity';
+import { User } from 'src/models/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, Agency, Campaign])],
+  imports: [TypeOrmModule.forFeature([Transaction, Agency, Campaign, User])],
   providers: [DonateService],
-  controllers: [DonateController]
+  controllers: [DonateController],
 })
 export class DonateModule {}
