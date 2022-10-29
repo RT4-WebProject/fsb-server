@@ -85,4 +85,25 @@ export class DonateService {
         });
     }
 
+    async approveAgency(id: any) {
+        const agency = await this.agencyRepository.findOne(id);
+        agency.approved = true;
+        return this.agencyRepository.save(agency);
+    }
+
+    async deleteAgency(id: any) {
+        return this.agencyRepository.delete(id);
+    }
+
+    async deleteCampaign(id: any) {
+        return this.campaignRepository.delete(id);
+    }
+
+    async launchCampaign(id: any) {
+        const campaign = await this.campaignRepository.findOne(id);
+        campaign.activeNow = true;
+        return this.campaignRepository.save(campaign);
+    }
+
+
 }

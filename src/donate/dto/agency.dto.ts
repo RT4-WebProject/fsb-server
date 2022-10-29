@@ -7,6 +7,6 @@ export class AgencyDto {
     phone: string;
     email: string;
     image: string;
-    approved: string;
+    approved: boolean;
     countries: string;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { DonateService } from './donate.service';
 import { AgencyDto } from './dto/agency.dto';
 import { CampaignDto } from './dto/campaign.dto';
@@ -74,4 +74,24 @@ export class DonateController {
         return this.donateService.getAgencyTransactions(id);
     }
 
+    @Put('approve/agency/:id')
+    async approveAgency(@Param('id') id: string) {
+        return this.donateService.approveAgency(id);
+    }
+    
+    @Delete('delete/agency/:id')
+    async deleteAgency(@Param('id') id: string) {
+        return this.donateService.deleteAgency(id);
+    }
+
+    @Delete('delete/campaign/:id')
+    async deleteCampaign(@Param('id') id: string) {
+        return this.donateService.deleteCampaign(id);
+    }
+
+    @Put('launch/campaign/:id')
+    async launchCampaign(@Param('id') id: string) {
+        return this.donateService.launchCampaign(id);
+    }
+    
 }

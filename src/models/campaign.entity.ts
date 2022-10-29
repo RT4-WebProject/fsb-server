@@ -9,7 +9,7 @@ export class Campaign extends BaseModel {
     launchedBy: string;
     @Column({type: 'varchar', length: 255})
     countries: string;
-    @Column({type: 'boolean', default: true})
+    @Column({type: 'boolean', default: false})
     activeNow: boolean;
     @Column({type: 'varchar', length: 255})
     link: string;

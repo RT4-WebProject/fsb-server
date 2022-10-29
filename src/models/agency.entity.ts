@@ -15,8 +15,8 @@ export class Agency extends BaseModel {
     email: string;
     @Column({type: 'varchar', length: 255})
     image: string;
-    @Column({type: 'varchar', length: 255})
-    approved: string;
+    @Column({type: 'boolean', default: false})
+    approved: boolean;
     @Column({type: 'varchar', length: 255})
     countries: string;
 }
