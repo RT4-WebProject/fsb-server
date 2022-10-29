@@ -1,5 +1,5 @@
 import { BaseModel } from "./base.entity";
-import { Entity, Column } from "typeorm";
+import { Entity, Column, Double } from "typeorm";
 
 @Entity({name: 'transaction'})
 export class Transaction extends BaseModel {
@@ -9,8 +9,8 @@ export class Transaction extends BaseModel {
     to: string;
     @Column({type: 'varchar', length: 255})
     cause: string;
-    @Column({type: 'double'})
-    amount: string;
+    @Column({type: 'float'})
+    amount: Double;
     @Column({type: 'varchar', length: 255})
     receiptStripe: string;
     @Column({type: 'varchar', length: 255})

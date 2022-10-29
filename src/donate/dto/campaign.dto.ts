@@ -1,3 +1,5 @@
+import { Double } from "typeorm";
+
 export class CampaignDto {
     id: string;
     createdAt: Date;
@@ -7,4 +9,5 @@ export class CampaignDto {
     activeNow: boolean;
     link: string;
     image: string;
+    goal: Double;
 }

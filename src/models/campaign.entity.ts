@@ -1,5 +1,5 @@
 import { BaseModel } from "./base.entity";
-import { Entity, Column } from "typeorm";
+import { Entity, Column, Double } from "typeorm";
 
 @Entity({name: 'campaign'})
 export class Campaign extends BaseModel {
@@ -15,4 +15,7 @@ export class Campaign extends BaseModel {
     link: string;
     @Column({type: 'varchar', length: 255})
     image: string;
+    @Column({type: 'float'})
+    goal: Double;
+    
 }

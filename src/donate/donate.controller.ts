@@ -5,7 +5,7 @@ import { CampaignDto } from './dto/campaign.dto';
 import { TransactionDto } from './dto/transaction.dto';
 
 
-@Controller('donate')
+@Controller('api')
 export class DonateController {
     constructor(private readonly donateService: DonateService) {}
 
