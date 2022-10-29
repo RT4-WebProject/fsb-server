@@ -16,6 +16,6 @@ export class Campaign extends BaseModel {
     @Column({type: 'varchar', length: 255})
     image: string;
     @Column({type: 'float'})
-    goal: Double;
+    goal: number;
     
 }

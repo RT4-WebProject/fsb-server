@@ -93,5 +93,22 @@ export class DonateController {
     async launchCampaign(@Param('id') id: string) {
         return this.donateService.launchCampaign(id);
     }
+
+    @Get('agency/:id/collected')
+    async getAgencyCollected(@Param('id') id: string) {
+        return this.donateService.getAgencyCollected(id);
+    }
+
+    @Get('campaign/:id/raised')
+    async getCampaignRaised(@Param('id') id: string) {
+        return this.donateService.getCampaignRaised(id);
+    }
+
+    @Get('agency/:id/activeCampaigns')
+    async getAgencyActiveCampaigns(@Param('id') id: string) {
+        return this.donateService.getAgencyActiveCampaigns(id);
+    }
+
+    
     
 }

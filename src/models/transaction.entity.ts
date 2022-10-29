@@ -3,14 +3,14 @@ import { Entity, Column, Double } from "typeorm";
 
 @Entity({name: 'transaction'})
 export class Transaction extends BaseModel {
-    @Column({type: 'varchar', length: 255})
+    @Column({type: 'varchar', length: 255, nullable: true})
     from: string;
     @Column({type: 'varchar', length: 255})
     to: string;
     @Column({type: 'varchar', length: 255})
     cause: string;
     @Column({type: 'float'})
-    amount: Double;
+    amount: number;
     @Column({type: 'varchar', length: 255})
     receiptStripe: string;
     @Column({type: 'varchar', length: 255})
@@ -21,4 +21,6 @@ export class Transaction extends BaseModel {
     campaignID: string;
     @Column({type: 'varchar', length: 255})
     agencyID: string;
+    @Column({type: 'varchar', length: 255})
+    feedback: string;
 }

@@ -9,4 +9,5 @@ export class AgencyDto {
     image: string;
     approved: boolean;
     countries: string;
+    description: string;
 }

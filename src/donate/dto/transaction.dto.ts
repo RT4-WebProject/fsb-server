@@ -6,10 +6,11 @@ export class TransactionDto{
     from: string;
     to: string;
     cause: string;
-    amount: Double;
+    amount: number;
     receiptStripe: string;
     receiptBlockchain: string;
     fromCountry: string;
     campaignID: string;
     agencyID: string;
+    feedback: string;
 }

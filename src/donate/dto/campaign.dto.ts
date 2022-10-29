@@ -9,5 +9,5 @@ export class CampaignDto {
     activeNow: boolean;
     link: string;
     image: string;
-    goal: Double;
+    goal: number;
 }

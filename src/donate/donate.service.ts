@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, Double } from 'typeorm';
 
 import { Agency } from '../models/agency.entity';
 import { Campaign } from '../models/campaign.entity';
@@ -105,5 +105,39 @@ export class DonateService {
         return this.campaignRepository.save(campaign);
     }
 
+    async getCampaignRaised(id: any) {
+        const transactions = await this.transactionRepository.find({
+            where: {
+                campaignID: id
+            }
+        });
+        let raised = 0;
+        transactions.forEach(transaction => {
+            raised += transaction.amount;
+        });
+        return raised;
+    }
+
+    async getAgencyCollected(id: any) {
+        const transactions = await this.transactionRepository.find({
+            where: {
+                agencyID: id
+            }
+        });
+        let collected = 0;
+        transactions.forEach(transaction => {
+            collected += transaction.amount;
+        });
+        return collected;
+    }
+
+    async getAgencyActiveCampaigns(id: any) {
+        return this.campaignRepository.find({
+            where: {
+                launchedBy: id,
+                activeNow: true
+            }
+        });
+    }
 
 }

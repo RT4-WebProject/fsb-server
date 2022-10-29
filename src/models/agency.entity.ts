@@ -19,4 +19,6 @@ export class Agency extends BaseModel {
     approved: boolean;
     @Column({type: 'varchar', length: 255})
     countries: string;
+    @Column({type: 'varchar', length: 255})
+    description: string;
 }
