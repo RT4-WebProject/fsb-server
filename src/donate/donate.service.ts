@@ -12,12 +12,15 @@ import {
   generateToken,
 } from 'src/common/auth.utils';
 import { User } from 'src/models/user.entity';
+import { register } from 'src/payment/blockchain';
+import { processTransaction } from 'src/payment/config';
 import { Repository, Like, Double, Not } from 'typeorm';
 
 import { Agency } from '../models/agency.entity';
 import { Campaign } from '../models/campaign.entity';
 import { Transaction } from '../models/transaction.entity';
 import { CreateAgencyDto } from './dto/agency.dto';
+import { TransactionDto } from './dto/transaction.dto';
 
 @Injectable()
 export class DonateService {
@@ -25,15 +28,30 @@ export class DonateService {
     @InjectRepository(Agency) private agencyRepository: Repository<Agency>,
     @InjectRepository(Campaign)
     private campaignRepository: Repository<Campaign>,
-    // @InjectRepository(Transaction)
-    // private transactionRepository: Repository<Transaction>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
-  //   async getAgency(id: any) {
-  //     return this.agencyRepository.findOne(id);
-  //   }
+  getAgency(id: any) {
+    return this.agencyRepository.findOne({
+      where: {
+        id,
+      },
+      select: [
+        'id',
+        'name',
+        'email',
+        'approved',
+        'role',
+        'description',
+        'countries',
+        'image',
+        'phone',
+      ],
+    });
+  }
 
   //   async getCampaign(id: any) {
   //     return this.campaignRepository.findOne(id);
@@ -55,6 +73,9 @@ export class DonateService {
 
   getAgencies() {
     return this.agencyRepository.find({
+      where: {
+        approved: true,
+      },
       select: [
         'id',
         'name',
@@ -98,10 +119,61 @@ export class DonateService {
     return this.campaignRepository.save(campaign);
   }
 
-  //   async createTransaction(transaction: Transaction) {
-  //     // transaction.id = this.uuid();
-  //     return this.transactionRepository.save(transaction);
-  //   }
+  async confirmTransaction(pk: any, amount: any) {
+    const transaction = await this.transactionRepository.findOne({
+      where: {
+        pk,
+      },
+    });
+
+    if (!transaction) {
+      throw new BadRequestException('Transaction not found');
+    }
+
+    transaction.amount = amount / 100;
+    transaction.approved = true;
+
+    await this.transactionRepository.save(transaction);
+
+    const tx = await register(
+      transaction.from,
+      transaction.agencyID,
+      amount / 100,
+    );
+
+    transaction.receiptBlockchain = tx.toString();
+
+    await this.transactionRepository.save(transaction);
+
+    return {
+      done: true,
+    };
+  }
+
+  async createTransaction(_transaction: TransactionDto) {
+    const transaction = new Transaction();
+    transaction.from = _transaction.from;
+    transaction.fromCountry = _transaction.fromCountry;
+    transaction.campaignID = _transaction.campaign;
+    transaction.agencyID = _transaction.agency;
+    transaction.feedback = _transaction.feedback;
+
+    // amount: number;
+    // receiptStripe: string;
+    // receiptBlockchain: string;
+
+    const { url, id } = await processTransaction(
+      Number(transaction.id),
+      `Donation to ${_transaction.title}`,
+      `${transaction.from} donating to ${_transaction.title}`,
+    );
+
+    transaction.pk = id;
+    await this.transactionRepository.save(transaction);
+    return {
+      url,
+    };
+  }
 
   //   async getCampaignsByCountry(country: string) {
   //     return this.campaignRepository.find({
@@ -111,13 +183,16 @@ export class DonateService {
   //     });
   //   }
 
-  //   async getAgencyTransactions(id: any) {
-  //     return this.transactionRepository.find({
-  //       where: {
-  //         agencyID: id,
-  //       },
-  //     });
-  //   }
+  getAgencyTransactions(id: any) {
+    console.log('id', id);
+
+    return this.transactionRepository.find({
+      where: {
+        agencyID: id,
+        approved: true,
+      },
+    });
+  }
 
   async approveAgency(id: any) {
     const agency = await this.agencyRepository.findOne({
@@ -146,18 +221,33 @@ export class DonateService {
   //     return this.campaignRepository.save(campaign);
   //   }
 
-  //   async getCampaignRaised(id: any) {
-  //     const transactions = await this.transactionRepository.find({
-  //       where: {
-  //         campaignID: id,
-  //       },
-  //     });
-  //     let raised = 0;
-  //     transactions.forEach((transaction) => {
-  //       raised += transaction.amount;
-  //     });
-  //     return raised;
-  //   }
+  async getCampaignRaised(id: any) {
+    const transactions = await this.transactionRepository.find({
+      where: {
+        agencyID: id,
+        approved: true,
+      },
+    });
+    let raised = 0;
+    transactions.forEach((transaction) => {
+      raised += transaction.amount;
+    });
+    return raised;
+  }
+
+  async getStatsCampaignRaised(id: any) {
+    const transactions = await this.transactionRepository.find({
+      where: {
+        campaignID: id,
+        approved: true,
+      },
+    });
+    let raised = 0;
+    transactions.forEach((transaction) => {
+      raised += transaction.amount;
+    });
+    return raised;
+  }
 
   //   async getAgencyCollected(id: any) {
   //     const transactions = await this.transactionRepository.find({
@@ -181,14 +271,16 @@ export class DonateService {
   //     });
   //   }
 
-  //   async getAgencyFeedbacks(id: any) {
-  //     return this.transactionRepository.find({
-  //       where: {
-  //         agencyID: id,
-  //         feedback: Not(Like('')),
-  //       },
-  //     });
-  //   }
+  getAgencyFeedbacks(id: any) {
+    return this.transactionRepository.find({
+      where: {
+        agencyID: id,
+        approved: true,
+        feedback: Not(Like('')),
+      },
+      select: ['id', 'feedback'],
+    });
+  }
 
   async createAgency(_agency: CreateAgencyDto) {
     try {

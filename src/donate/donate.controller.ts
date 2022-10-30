@@ -6,6 +6,9 @@ import {
   Param,
   Post,
   Put,
+  RawBodyRequest,
+  Req,
+  Request,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Authentify } from 'src/decorators/authentify';
@@ -17,6 +20,23 @@ import { TransactionDto } from './dto/transaction.dto';
 @Controller('api')
 export class DonateController {
   constructor(private readonly donateService: DonateService) {}
+
+  @Post('webhook')
+  webhook(@Req() req: RawBodyRequest<Request>) {
+    const data = (req.body as any).data.object;
+    console.log(data);
+
+    console.log(data.payment_status);
+
+    if (data.payment_status === 'paid') {
+      const amount = data.amount_total;
+      const pk = data.payment_link;
+      return this.donateService.confirmTransaction(pk, amount);
+    }
+    return {
+      ok: false,
+    };
+  }
 
   @Get('me')
   me(@Authentify() user) {
@@ -41,10 +61,10 @@ export class DonateController {
     return this.donateService.approveAgency(id);
   }
 
-  //   @Get('agency/:id')
-  //   async getAgency(@Param('id') id: string) {
-  //     return this.donateService.getAgency(id);
-  //   }
+  @Get('agency/:id')
+  getAgency(@Param('id') id: string) {
+    return this.donateService.getAgency(id);
+  }
 
   //   @Get('campaign/:id')
   //   async getCampaign(@Param('id') id: string) {
@@ -61,10 +81,10 @@ export class DonateController {
   //     return this.donateService.getTransactions();
   //   }
 
-  //   @Get('campaigns')
-  //   async getCampaigns() {
-  //     return this.donateService.getCampaigns();
-  //   }
+  @Get('campaigns')
+  getCampaigns() {
+    return this.donateService.getCampaigns();
+  }
 
   @Get('agency')
   getAgencies() {
@@ -77,6 +97,11 @@ export class DonateController {
       throw new UnauthorizedException();
     }
     return this.donateService.getAgencyCampaigns(user.id);
+  }
+
+  @Get('agency/campaign/:id')
+  getAgencyCampaignsById(@Param('id') id: string) {
+    return this.donateService.getAgencyCampaigns(id);
   }
 
   //   @Get('campaign/:id/transactions')
@@ -93,10 +118,10 @@ export class DonateController {
     return this.donateService.createCampaign(user.id, campaign);
   }
 
-  //   @Post('transaction')
-  //   async createTransaction(@Body() transaction: TransactionDto) {
-  //     return this.donateService.createTransaction(transaction);
-  //   }
+  @Post('tx')
+  createTransaction(@Body() transaction: TransactionDto) {
+    return this.donateService.createTransaction(transaction);
+  }
 
   // @Get('campaigns/:country')
   // getCampaignsByCountry(@Param('country') country: string) {
@@ -108,10 +133,14 @@ export class DonateController {
     return this.donateService.getCampaigns();
   }
 
-  //   @Get('agency/:id/transactons')
-  //   async getAgencyTransactions(@Param('id') id: string) {
-  //     return this.donateService.getAgencyTransactions(id);
-  //   }
+  @Get('agency/tx/all')
+  getAgencyTransactions(@Authentify() user) {
+    if (!user || user.role !== 'agency') {
+      throw new UnauthorizedException();
+    }
+
+    return this.donateService.getAgencyTransactions(user.id);
+  }
 
   //   @Delete('delete/agency/:id')
   //   async deleteAgency(@Param('id') id: string) {
@@ -133,18 +162,32 @@ export class DonateController {
   //     return this.donateService.getAgencyCollected(id);
   //   }
 
-  //   @Get('campaign/:id/raised')
-  //   async getCampaignRaised(@Param('id') id: string) {
-  //     return this.donateService.getCampaignRaised(id);
-  //   }
+  @Get('campaign/tx/raised')
+  getCampaignRaised(@Authentify() user) {
+    if (!user || user.role !== 'agency') {
+      throw new UnauthorizedException();
+    }
+    return this.donateService.getCampaignRaised(user.id);
+  }
+
+  @Get('campaign/tx/raised/:campaign')
+  getStatsCampaignRaised(@Authentify() user, @Param('campaign') campaign) {
+    if (!user || user.role !== 'agency') {
+      throw new UnauthorizedException();
+    }
+    return this.donateService.getStatsCampaignRaised(campaign);
+  }
 
   //   @Get('agency/:id/activeCampaigns')
   //   async getAgencyActiveCampaigns(@Param('id') id: string) {
   //     return this.donateService.getAgencyActiveCampaigns(id);
   //   }
 
-  //   @Get('agency/:id/feedbacks')
-  //   async getAgencyFeedbacks(@Param('id') id: string) {
-  //     return this.donateService.getAgencyFeedbacks(id);
+  // @Get('agency/tx/feedbacks')
+  // getAgencyFeedbacks(@Authentify() user) {
+  //   if (!user || user.role !== 'agency') {
+  //     throw new UnauthorizedException();
   //   }
+  //   return this.donateService.getAgencyFeedbacks(user.id);
+  // }
 }
