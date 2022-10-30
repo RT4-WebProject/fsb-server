@@ -5,10 +5,13 @@ import { Entity, Column, Double } from 'typeorm';
 export class Campaign extends BaseModel {
   @Column({ type: 'varchar', length: 255 })
   title: string;
+
   @Column({ type: 'varchar', length: 255 })
-  launchedBy: string;
+  description: string;
+  @Column()
+  launchedBy: number;
   @Column({ type: 'varchar', length: 255 })
-  countries: string;
+  country: string;
   @Column({ type: 'boolean', default: false })
   activeNow: boolean;
   @Column({ type: 'varchar', length: 255 })

@@ -71,30 +71,42 @@ export class DonateController {
     return this.donateService.getAgencies();
   }
 
-  //   @Get('agency/:id/campaigns')
-  //   async getAgencyCampaigns(@Param('id') id: string) {
-  //     return this.donateService.getAgencyCampaigns(id);
-  //   }
+  @Get('campaign')
+  getAgencyCampaigns(@Authentify() user) {
+    if (!user || user.role !== 'agency') {
+      throw new UnauthorizedException();
+    }
+    return this.donateService.getAgencyCampaigns(user.id);
+  }
 
   //   @Get('campaign/:id/transactions')
   //   async getCampaignTransactions(@Param('id') id: string) {
   //     return this.donateService.getCampaignTransactions(id);
   //   }
 
-  //   @Post('campaign')
-  //   async createCampaign(@Body() campaign: CampaignDto) {
-  //     return this.donateService.createCampaign(campaign);
-  //   }
+  @Post('campaign')
+  createCampaign(@Body() campaign: CampaignDto, @Authentify() user) {
+    if (!user || user.role !== 'agency') {
+      throw new UnauthorizedException();
+    }
+
+    return this.donateService.createCampaign(user.id, campaign);
+  }
 
   //   @Post('transaction')
   //   async createTransaction(@Body() transaction: TransactionDto) {
   //     return this.donateService.createTransaction(transaction);
   //   }
 
-  //   @Get('campaigns/:country')
-  //   async getCampaignsByCountry(@Param('country') country: string) {
-  //     return this.donateService.getCampaignsByCountry(country);
-  //   }
+  // @Get('campaigns/:country')
+  // getCampaignsByCountry(@Param('country') country: string) {
+  //   return this.donateService.getCampaigns(country);
+  // }
+
+  @Get('campaigns/all')
+  getCampaignsByCountry() {
+    return this.donateService.getCampaigns();
+  }
 
   //   @Get('agency/:id/transactons')
   //   async getAgencyTransactions(@Param('id') id: string) {

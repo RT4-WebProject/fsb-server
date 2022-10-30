@@ -1,13 +1,31 @@
-import { Double } from "typeorm";
+import {
+  IsNotEmpty,
+  IsEnum,
+  IsOptional,
+  IsNumberString,
+  IsEmail,
+  IsNumber,
+  IsPositive,
+} from 'class-validator';
 
 export class CampaignDto {
-    id: string;
-    createdAt: Date;
-    title: string;
-    launchedBy: string;
-    countries: string;
-    activeNow: boolean;
-    link: string;
-    image: string;
-    goal: number;
+  @IsNotEmpty()
+  title: string;
+
+  @IsNotEmpty()
+  country: string;
+
+  @IsNotEmpty()
+  description: string;
+
+  @IsNotEmpty()
+  link: string;
+
+  @IsNotEmpty()
+  image: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  goal: number;
 }

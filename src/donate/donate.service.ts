@@ -23,8 +23,8 @@ import { CreateAgencyDto } from './dto/agency.dto';
 export class DonateService {
   constructor(
     @InjectRepository(Agency) private agencyRepository: Repository<Agency>,
-    // @InjectRepository(Campaign)
-    // private campaignRepository: Repository<Campaign>,
+    @InjectRepository(Campaign)
+    private campaignRepository: Repository<Campaign>,
     // @InjectRepository(Transaction)
     // private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
@@ -47,9 +47,11 @@ export class DonateService {
   //     return this.transactionRepository.find();
   //   }
 
-  //   async getCampaigns() {
-  //     return this.campaignRepository.find();
-  //   }
+  getCampaigns() {
+    return this.campaignRepository.find({
+      where: {},
+    });
+  }
 
   getAgencies() {
     return this.agencyRepository.find({
@@ -67,13 +69,13 @@ export class DonateService {
     });
   }
 
-  //   async getAgencyCampaigns(id: any) {
-  //     return this.campaignRepository.find({
-  //       where: {
-  //         launchedBy: id,
-  //       },
-  //     });
-  //   }
+  getAgencyCampaigns(id: any) {
+    return this.campaignRepository.find({
+      where: {
+        launchedBy: id,
+      },
+    });
+  }
 
   //   async getCampaignTransactions(id: any) {
   //     return this.transactionRepository.find({
@@ -83,10 +85,18 @@ export class DonateService {
   //     });
   //   }
 
-  //   async createCampaign(campaign: Campaign) {
-  //     // campaign.id = this.uuid();
-  //     return this.campaignRepository.save(campaign);
-  //   }
+  createCampaign(by: number, _campaign: any) {
+    const campaign = new Campaign();
+    campaign.title = _campaign.title;
+    campaign.description = _campaign.description;
+    campaign.image = _campaign.image;
+    campaign.goal = _campaign.goal;
+    campaign.link = _campaign.link;
+    campaign.country = _campaign.country;
+    campaign.launchedBy = by;
+
+    return this.campaignRepository.save(campaign);
+  }
 
   //   async createTransaction(transaction: Transaction) {
   //     // transaction.id = this.uuid();
@@ -221,7 +231,16 @@ export class DonateService {
         where: {
           id,
         },
-        select: ['id', 'name', 'email', 'approved', 'role'],
+        select: [
+          'id',
+          'name',
+          'email',
+          'approved',
+          'role',
+          'image',
+          'description',
+          'countries',
+        ],
       });
       if (!agency) {
         throw new ForbiddenException();
