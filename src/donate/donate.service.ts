@@ -73,9 +73,7 @@ export class DonateService {
 
   getAgencies() {
     return this.agencyRepository.find({
-      where: {
-        approved: true,
-      },
+      where: {},
       select: [
         'id',
         'name',
