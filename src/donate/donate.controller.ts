@@ -63,7 +63,7 @@ export class DonateController {
 
   @Get('agency/:id')
   getAgency(@Param('id') id: string) {
-    return this.donateService.getAgency(id);
+     return this.donateService.getAgency(id);
   }
 
   //   @Get('campaign/:id')

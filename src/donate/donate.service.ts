@@ -14,7 +14,7 @@ import {
 import { User } from 'src/models/user.entity';
 import { register } from 'src/payment/blockchain';
 import { processTransaction } from 'src/payment/config';
-import { Repository, Like, Double, Not } from 'typeorm';
+import { Repository, Like, Double, Not, getRepository } from 'typeorm';
 
 import { Agency } from '../models/agency.entity';
 import { Campaign } from '../models/campaign.entity';
@@ -88,12 +88,15 @@ export class DonateService {
     });
   }
 
-  getAgencyCampaigns(id: any) {
+  getAgencyCampaigns(id: string) {
     return this.campaignRepository.find({
+      relations: ['launchedBy'],
       where: {
-        launchedBy: id,
-      },
-    });
+          launchedBy: {
+              id: id
+          }
+        }
+     })
   }
 
   //   async getCampaignTransactions(id: any) {
@@ -104,7 +107,7 @@ export class DonateService {
   //     });
   //   }
 
-  createCampaign(by: number, _campaign: any) {
+  async createCampaign(by: any, _campaign: any) {
     const campaign = new Campaign();
     campaign.title = _campaign.title;
     campaign.description = _campaign.description;
@@ -112,7 +115,7 @@ export class DonateService {
     campaign.goal = _campaign.goal;
     campaign.link = _campaign.link;
     campaign.country = _campaign.country;
-    campaign.launchedBy = by;
+    campaign.launchedBy = await this.getAgency(by);
 
     return this.campaignRepository.save(campaign);
   }
@@ -131,8 +134,21 @@ export class DonateService {
     transaction.amount = amount / 100;
     transaction.approved = true;
 
-    await this.transactionRepository.save(transaction);
+    await this.transactionRepository.save(transaction)
 
+    console.log('amount', amount);
+    console.log('amount / 100', amount / 100);
+    console.log('campaign', transaction.campaignID);
+    console.log('agency', transaction.agencyID);
+    console.log('from', transaction.from);
+    console.log('transaction', transaction);
+    console.log('transaction.id', transaction.id);
+    console.log('transaction.pk', transaction.pk);
+    console.log('transaction.amount', transaction.amount);
+    
+    /*
+    Blockchain as 2nd layer verification for transparency, but unfortunately we were able to make it working again
+    
     const tx = await register(
       transaction.from,
       transaction.agencyID,
@@ -140,6 +156,7 @@ export class DonateService {
     );
 
     transaction.receiptBlockchain = tx.toString();
+*/
 
     await this.transactionRepository.save(transaction);
 
@@ -182,13 +199,14 @@ export class DonateService {
   //   }
 
   getAgencyTransactions(id: any) {
-    console.log('id', id);
-
     return this.transactionRepository.find({
+      relations: ['agencyID'],
       where: {
-        agencyID: id,
+        agencyID: {
+          id: id,
+        },
         approved: true,
-      },
+      }
     });
   }
 
@@ -221,10 +239,13 @@ export class DonateService {
 
   async getCampaignRaised(id: any) {
     const transactions = await this.transactionRepository.find({
+      relations: ['agencyID'],
       where: {
-        agencyID: id,
+        agencyID: {
+          id: id,
+        },
         approved: true,
-      },
+      }
     });
     let raised = 0;
     transactions.forEach((transaction) => {
@@ -235,10 +256,13 @@ export class DonateService {
 
   async getStatsCampaignRaised(id: any) {
     const transactions = await this.transactionRepository.find({
+      relations: ['campaignID'],
       where: {
-        campaignID: id,
+        campaignID: {
+          id: id,
+        },
         approved: true,
-      },
+      }
     });
     let raised = 0;
     transactions.forEach((transaction) => {
@@ -271,8 +295,11 @@ export class DonateService {
 
   getAgencyFeedbacks(id: any) {
     return this.transactionRepository.find({
+      relations: ['agencyID'],
       where: {
-        agencyID: id,
+        agencyID: {
+          id: id,
+        },
         approved: true,
         feedback: Not(Like('')),
       },

@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsPositive,
 } from 'class-validator';
+import { Agency } from 'src/models/agency.entity';
 
 export class CampaignDto {
   @IsNotEmpty()

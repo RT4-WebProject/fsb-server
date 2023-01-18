@@ -24,5 +24,6 @@ export const comparePassword = async (password: string, hash: string) => {
 };
 
 export const verifyToken = (token: string) => {
+  if(!token) return null;
   return jwt.verify(token, process.env.JWT_SECRET);
 };

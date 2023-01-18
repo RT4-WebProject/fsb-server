@@ -1,4 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Agency } from 'src/models/agency.entity';
+import { Campaign } from 'src/models/campaign.entity';
 
 export class TransactionDto {
   @IsNotEmpty()
@@ -15,10 +17,10 @@ export class TransactionDto {
   fromCountry: string;
 
   @IsOptional()
-  campaign: string;
+  campaign: Campaign;
 
   @IsNotEmpty()
-  agency: string;
+  agency: Agency;
 
   @IsOptional()
   feedback: string;
